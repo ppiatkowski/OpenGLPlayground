@@ -30,33 +30,37 @@ struct VBOInfo {
 class Model
 {
 public:
-    std::shared_ptr<ShaderProgram> program;
-    std::shared_ptr<Texture> texture;
-
-    GLenum drawPrimitive;
-    GLint drawStart;
-    GLint drawCount;
-    GLuint VAO;
-    
-    //GLfloat shininess;
-    //glm::vec3 specularColor;
-
-
-    Model(const char *name);
+    Model(const char *nam, GLint drawCount, GLint drawStart, GLenum drawPrimitive, std::shared_ptr<ShaderProgram> program, std::shared_ptr<Texture> texture);
     virtual ~Model();
+
+    void Render(const glm::mat4 &VP, const glm::mat4 &transform) const;
 
     //bool Load(const std::string &modelPath);
     //bool Load(unsigned int vertexCnt, float vertices[], float colors[]);
 
     void AddVBO(const VBOInfo &vbo);
     void Load();
-    //void Render(const glm::mat4 &MVP) const;
     bool IsLoaded() const;
 
 private:
+    std::shared_ptr<ShaderProgram> program;
+    std::shared_ptr<Texture> texture;
+
+    GLenum drawPrimitive;
+    GLint drawStart;
+    GLint drawCount;
+
+    GLuint VAO;
     std::vector<VBOInfo> VBOs;
     bool loaded;
     std::string name;
+
+    GLuint shaderMatrixID;
+    GLuint shaderTransformID;
+    GLuint shaderTextureID;
+
+    //GLfloat shininess;
+    //glm::vec3 specularColor;
     
 };
 

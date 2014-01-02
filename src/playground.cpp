@@ -27,14 +27,19 @@ using namespace glm;
 const int LINE_CNT = 100;
 const float GRID_SIZE = 100.0f;
 
-class Renderer
+class App
 {
 public:
-    Renderer() {}
+    App() {}
 
     void AddEntity(const std::shared_ptr<Entity> &entity) 
     {
         entities.push_back(entity);
+    }
+
+    void Update(double dt)
+    {
+        // TODO
     }
 
     void Render()
@@ -45,7 +50,6 @@ public:
         computeMatricesFromInputs();
         glm::mat4 ProjectionMatrix = getProjectionMatrix();
         glm::mat4 ViewMatrix = getViewMatrix();
-        glm::mat4 ModelMatrix = glm::mat4(1.0);//glm::rotate(glm::mat4(1.0), 45.f, glm::vec3(0,1,0));
         glm::mat4 VP = ProjectionMatrix * ViewMatrix;
 
         // render loop
@@ -117,7 +121,7 @@ int main( void )
         return 1;
     }
 
-    Renderer *renderer = new Renderer();
+    App *app = new App();
 
     /* GRID */
     float newGridVert[8*LINE_CNT*2*2];
@@ -174,11 +178,9 @@ int main( void )
         index += 16;
     }
 
-    std::shared_ptr<Model> gridModel = std::make_shared<Model>("grid");
-    gridModel->drawCount = LINE_CNT*2*2;
-    gridModel->drawStart = 0;
-    gridModel->drawPrimitive = GL_LINES;
-    gridModel->program = std::make_shared<ShaderProgram>("resources/shaders/GridAlpha.vertex", "resources/shaders/GridAlpha.frag");
+    std::shared_ptr<Model> gridModel = std::make_shared<Model>("grid", LINE_CNT*2*2, 0, GL_LINES, 
+                                                               std::make_shared<ShaderProgram>("resources/shaders/GridAlpha.vertex", "resources/shaders/GridAlpha.frag"),
+                                                               std::shared_ptr<Texture>(NULL));
 
     VBOInfo vbo;
     vbo.format = VertexFormat_XYZW_RGBA;
@@ -188,19 +190,16 @@ int main( void )
     gridModel->Load();
 
     std::shared_ptr<Entity> grid = std::make_shared<Entity>(gridModel);
-    renderer->AddEntity(grid);
+    app->AddEntity(grid);
 
     std::shared_ptr<Entity> grid2 = std::make_shared<Entity>(gridModel);
     grid2->SetPosition(glm::vec3(0.0, 10.0, 0.0));
-    renderer->AddEntity(grid2);
+    app->AddEntity(grid2);
 
     /* CUBE */
-    std::shared_ptr<Model> cubeModel = std::make_shared<Model>("cube");
-    cubeModel->drawCount = 12 * 3;
-    cubeModel->drawStart = 0;
-    cubeModel->drawPrimitive = GL_TRIANGLES;
-    cubeModel->program = std::make_shared<ShaderProgram>("resources/shaders/CubeShader.vertex", "resources/shaders/CubeShader.frag");
-    cubeModel->texture = std::make_shared<Texture>(Texture::Format_DDS, std::string("resources/textures/uvtemplate.DDS"));
+    std::shared_ptr<Model> cubeModel = std::make_shared<Model>("cube", 12*3, 0, GL_TRIANGLES, 
+                                                               std::make_shared<ShaderProgram>("resources/shaders/CubeShader.vertex", "resources/shaders/CubeShader.frag"),
+                                                               std::make_shared<Texture>(Texture::Format_DDS, std::string("resources/textures/uvtemplate.DDS")) );
 
     VBOInfo cubeVert;
     cubeVert.format = VertexFormat_XYZ;
@@ -214,21 +213,35 @@ int main( void )
     cubeModel->Load();
 
     std::shared_ptr<Entity> cube = std::make_shared<Entity>(cubeModel);
-    renderer->AddEntity(cube);
+    app->AddEntity(cube);
+
+    std::shared_ptr<Entity> cube2 = std::make_shared<Entity>(cubeModel);
+    cube2->SetPosition(glm::vec3(3.0, 5.0, -4.0));
+    cube2->SetRotation(glm::vec3(45.0, 45.0, 45.0));
+    cube2->SetScale(glm::vec3(1.0, 0.5, 0.5));
+    app->AddEntity(cube2);
 
     // Enable blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    double prevFrame = glfwGetTime();
     do {
+        double now = glfwGetTime();
+        double dt = now - prevFrame;
 
-        renderer->Render();
+        // update here
+        app->Update(dt);
+
+        prevFrame = now;
+
+        app->Render();
 
     } // Check if the ESC key was pressed or the window was closed
     while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS &&
         glfwGetWindowParam( GLFW_OPENED ) );
 
-    delete renderer;
+    delete app;
 
     // Close OpenGL window and terminate GLFW
     glfwTerminate();

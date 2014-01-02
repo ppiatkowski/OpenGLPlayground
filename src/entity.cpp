@@ -7,7 +7,6 @@ using namespace glm;
 
 Entity::Entity(std::shared_ptr<Model> m) : 
     model(m), 
-    shaderMatrixID(0),
     transform(glm::mat4(1)),
     position(glm::vec3(0)),
     rotation(glm::vec3(0)),
@@ -16,12 +15,6 @@ Entity::Entity(std::shared_ptr<Model> m) :
 {
     assert(model && "Entity requires a model");
     assert(model->IsLoaded() && "Model must be loaded");
-    GLuint shaderID = model->program->id();
-    this->shaderMatrixID = glGetUniformLocation(shaderID, "VP");
-    this->shaderTransformID = glGetUniformLocation(shaderID, "transform");
-    if (model->texture) {
-        this->shaderTextureID = glGetUniformLocation(shaderID, "myTextureSampler");
-    }
 }
 
 Entity::~Entity()
@@ -32,26 +25,8 @@ Entity::~Entity()
 void Entity::Render(const glm::mat4 &VP) const
 {
     assert(model && "Entity without a model cannot be rendered");
-    model->program->use();
 
-    if (model->texture) {
-        GLuint textureId = model->texture->id();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureId);
-        glUniform1i(shaderTextureID, 0);
-    }
-
-    glUniformMatrix4fv(shaderMatrixID, 1, GL_FALSE, &VP[0][0]);
-    glUniformMatrix4fv(shaderTransformID, 1, GL_FALSE, &transform[0][0]);
-
-    glBindVertexArray(model->VAO);
-    glDrawArrays(model->drawPrimitive, model->drawStart, model->drawCount);
-
-    if (model->texture) {
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-    glBindVertexArray(0);
-    model->program->stopUsing();
+    model->Render(VP, transform);
 }
 
 void Entity::CalculateTransform()

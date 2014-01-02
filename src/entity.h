@@ -31,8 +31,5 @@ private:
 
     std::shared_ptr<Model> model;
     glm::mat4 transform;
-    GLuint shaderMatrixID;
-    GLuint shaderTransformID;
-    GLuint shaderTextureID;
 };
 #endif // _ENTITY_H_
