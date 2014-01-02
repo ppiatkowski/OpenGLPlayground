@@ -24,12 +24,6 @@ using namespace glm;
 #include "entity.h"
 #include "model.h"
 
-Model *g_cubeModel;
-
-GLuint cubeVAO, cubeVBO, cubeUvVBO;
-GLuint cubeMatrixID;
-GLuint cubeTextureID;
-
 const int LINE_CNT = 100;
 const float GRID_SIZE = 100.0f;
 
@@ -234,12 +228,7 @@ int main( void )
     while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS &&
         glfwGetWindowParam( GLFW_OPENED ) );
 
-    delete g_cubeModel;
     delete renderer;
-
-    // Cleanup VBO and shader
-    glDeleteBuffers(1, &cubeVBO);
-    glDeleteBuffers(1, &cubeUvVBO);
 
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
