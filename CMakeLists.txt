@@ -68,6 +68,7 @@ add_executable(playground
 	src/controls.h
 	src/texture.cpp
 	src/texture.h
+	src/vertexData.h
 	
 	resources/shaders/GridAlpha.vertex
 	resources/shaders/GridAlpha.frag
