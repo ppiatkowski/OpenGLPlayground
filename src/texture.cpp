@@ -55,7 +55,7 @@ GLuint Texture::load()
             return loadTGA_glfw();
     }
 
-    throw std::runtime_error( std::string("unrecognized texture format: ") + std::string( itoa10(this->textureFormat, NULL) ));
+    throw std::runtime_error( std::string("unrecognized texture format: ") + toStr(this->textureFormat) );
     return 0;
 }
 
