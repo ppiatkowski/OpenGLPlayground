@@ -1,0 +1,19 @@
+#version 330 core
+
+in vec4 vert;
+in vec4 color;
+
+// Output data ; will be interpolated for each fragment.
+out float vertexDistance;
+out vec4 vColor;
+
+// Values that stay constant for the whole mesh.
+uniform mat4 VP;
+uniform mat4 transform;
+
+void main(){
+    gl_Position =  VP * transform * vert;
+    vertexDistance = gl_Position.z;
+    vColor = color;
+}
+
