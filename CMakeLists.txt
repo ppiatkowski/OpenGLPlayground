@@ -53,6 +53,7 @@ add_definitions(
 	-DTW_NO_DIRECT3D
 	-DGLEW_STATIC
 	-D_CRT_SECURE_NO_WARNINGS
+	-std=c++11
 )
 
 
@@ -69,6 +70,7 @@ add_executable(playground
 	src/texture.cpp
 	src/texture.h
 	src/vertexData.h
+	src/utils.h
 	
 	resources/shaders/GridAlpha.vertex
 	resources/shaders/GridAlpha.frag
