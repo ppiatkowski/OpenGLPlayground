@@ -1,8 +1,11 @@
 #include "texture.h"
 
+#include "utils.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdexcept>
 #include <iostream>
 
 #include <GL/glew.h>
@@ -52,7 +55,7 @@ GLuint Texture::load()
             return loadTGA_glfw();
     }
 
-    throw std::runtime_error( std::string("unrecognized texture format: ") + std::string( _itoa(this->textureFormat, NULL, 10) ));
+    throw std::runtime_error( std::string("unrecognized texture format: ") + std::string( itoa10(this->textureFormat, NULL) ));
     return 0;
 }
 

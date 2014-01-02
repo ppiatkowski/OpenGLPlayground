@@ -1,8 +1,6 @@
 #ifndef _VERTEX_DATA_H_
 #define _VERTEX_DATA_H_
 
-#include <gl/gl.h>
-
 // Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
 // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
 static const GLfloat g_vertex_buffer_data[] = { 
