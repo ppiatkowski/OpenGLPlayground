@@ -42,17 +42,17 @@ void computeMatricesFromInputs(){
     float deltaTime = float(currentTime - lastTime);
 
     // Get mouse position
-    int xpos = 1024 / 2;
-    int ypos = 768 / 2;
+    int xpos = SCREEN_WIDTH / 2;
+    int ypos = SCREEN_HEIGHT / 2;
     if (glfwGetKey( GLFW_KEY_LCTRL ) != GLFW_PRESS) {
         glfwGetMousePos(&xpos, &ypos);
         // Reset mouse position for next frame
-        glfwSetMousePos(1024/2, 768/2);
+        glfwSetMousePos(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
     }
 
     // Compute new orientation
-    horizontalAngle += mouseSpeed * float(1024/2 - xpos ) * deltaTime;
-    verticalAngle   += mouseSpeed * float( 768/2 - ypos ) * deltaTime;
+    horizontalAngle += mouseSpeed * float(SCREEN_WIDTH/2 - xpos ) * deltaTime;
+    verticalAngle   += mouseSpeed * float( SCREEN_HEIGHT/2 - ypos ) * deltaTime;
 
     // Direction : Spherical coordinates to Cartesian coordinates conversion
     glm::vec3 direction(
@@ -96,7 +96,7 @@ void computeMatricesFromInputs(){
     float FoV = initialFoV - 5 * glfwGetMouseWheel();
 
     // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-    ProjectionMatrix = glm::perspective(FoV, 4.0f / 3.0f, 0.1f, 500.0f);
+    ProjectionMatrix = glm::perspective(FoV, (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 500.0f);
     // Camera matrix
     ViewMatrix       = glm::lookAt(
         position,           // Camera is here
