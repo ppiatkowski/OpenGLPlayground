@@ -12,18 +12,22 @@ class Model;
 class Entity
 {
 public:
-    Entity(std::shared_ptr<Model> m);
+    Entity(const char *name, std::shared_ptr<Model> m);
     virtual ~Entity();
 
     void SetPosition(const glm::vec3 &pos);
     void SetRotation(const glm::vec3 &vec);
     void SetScale(const glm::vec3 &scale);
 
+    glm::vec3 Rotation() const;
+
     void Render(const glm::mat4 &mvp) const;
+    std::string Name() const;
 
 private:
     void CalculateTransform();
 
+    std::string name;
     bool matrixDirty;
     glm::vec3 position;
     glm::vec3 scale;

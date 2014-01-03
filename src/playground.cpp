@@ -1,7 +1,7 @@
 // Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
-#include <list>
+#include <map>
 #include <iostream>
 #include <memory>
 
@@ -32,14 +32,23 @@ class App
 public:
     App() {}
 
-    void AddEntity(const std::shared_ptr<Entity> &entity) 
+    void AddEntity(const std::shared_ptr<Entity> &entity)
     {
-        entities.push_back(entity);
+        entities[entity->Name()] = entity;
+    }
+
+    std::shared_ptr<Entity> GetEntity(std::string name)
+    {
+        return entities[name];
     }
 
     void Update(double dt)
     {
-        // TODO
+        // update loop
+        std::map< std::string, std::shared_ptr<Entity> >::iterator it = entities.begin();
+        for (; it != entities.end(); ++it) {
+            // TODO
+        }
     }
 
     void Render()
@@ -53,9 +62,9 @@ public:
         glm::mat4 VP = ProjectionMatrix * ViewMatrix;
 
         // render loop
-        std::list< std::shared_ptr<Entity> >::iterator it = entities.begin();
+        std::map< std::string, std::shared_ptr<Entity> >::iterator it = entities.begin();
         for (; it != entities.end(); ++it) {
-            (*it)->Render(VP);
+            (*it).second->Render(VP);
         }
 
         // Swap buffers
@@ -63,8 +72,10 @@ public:
     }
 
 private:
-    std::list< std::shared_ptr<Entity> > entities;
+    std::map< std::string, std::shared_ptr<Entity> > entities;
 };
+
+App *app = NULL;
 
 int init( void )
 {
@@ -121,7 +132,7 @@ int main( void )
         return 1;
     }
 
-    App *app = new App();
+    app = new App();
 
     /* GRID */
     float newGridVert[8*LINE_CNT*2*2];
@@ -189,10 +200,10 @@ int main( void )
 
     gridModel->Load();
 
-    std::shared_ptr<Entity> grid = std::make_shared<Entity>(gridModel);
+    std::shared_ptr<Entity> grid = std::make_shared<Entity>("gridBottom", gridModel);
     app->AddEntity(grid);
 
-    std::shared_ptr<Entity> grid2 = std::make_shared<Entity>(gridModel);
+    std::shared_ptr<Entity> grid2 = std::make_shared<Entity>("gridTop", gridModel);
     grid2->SetPosition(glm::vec3(0.0, 10.0, 0.0));
     app->AddEntity(grid2);
 
@@ -210,16 +221,39 @@ int main( void )
     cubeUV.format = VertexFormat_UV;
     cubeUV.vertexData = std::vector<float>(g_uv_buffer_data, g_uv_buffer_data + 12*2*3);
     cubeModel->AddVBO(cubeUV);
+
+    VBOInfo cubeNormals;
+    cubeNormals.format = VertexFormat_NXYZ;
+    cubeNormals.vertexData = std::vector<float>(g_normal_buffer_data, g_normal_buffer_data + 12*3*3);
+    cubeModel->AddVBO(cubeNormals);
+
     cubeModel->Load();
 
-    std::shared_ptr<Entity> cube = std::make_shared<Entity>(cubeModel);
+    std::shared_ptr<Entity> cube = std::make_shared<Entity>("cube1", cubeModel);
     app->AddEntity(cube);
 
-    std::shared_ptr<Entity> cube2 = std::make_shared<Entity>(cubeModel);
+    std::shared_ptr<Entity> cube2 = std::make_shared<Entity>("cube2", cubeModel);
     cube2->SetPosition(glm::vec3(3.0, 5.0, -4.0));
     cube2->SetRotation(glm::vec3(45.0, 45.0, 45.0));
     cube2->SetScale(glm::vec3(1.0, 0.5, 0.5));
     app->AddEntity(cube2);
+
+
+    // LIGHT SOURCE
+    std::shared_ptr<Model> lightModel = std::make_shared<Model>("light", 12*3, 0, GL_TRIANGLES, 
+                                                               std::make_shared<ShaderProgram>("resources/shaders/CubeShader.vertex", "resources/shaders/CubeShader.frag"),
+                                                               std::shared_ptr<Texture>(NULL));
+
+    VBOInfo lightVert;
+    lightVert.format = VertexFormat_XYZ;
+    lightVert.vertexData = std::vector<float>(g_vertex_buffer_data, g_vertex_buffer_data + 12*3*3);
+    lightModel->AddVBO(cubeVert);
+    lightModel->Load();
+
+    std::shared_ptr<Entity> lightSource = std::make_shared<Entity>("lightSource", lightModel);
+    lightSource->SetScale(glm::vec3(0.2, 0.2, 0.2));
+    lightSource->SetPosition(glm::vec3(-1.0, 3.0, -2.0));
+    app->AddEntity(lightSource);
 
     // Enable blending
     glEnable(GL_BLEND);

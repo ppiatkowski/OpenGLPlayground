@@ -5,7 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-Entity::Entity(std::shared_ptr<Model> m) : 
+Entity::Entity(const char *nam, std::shared_ptr<Model> m) : 
+    name(nam),
     model(m), 
     transform(glm::mat4(1)),
     position(glm::vec3(0)),
@@ -73,4 +74,14 @@ void Entity::SetScale(const glm::vec3 &s)
         matrixDirty = true;
         CalculateTransform();
     }
+}
+
+glm::vec3 Entity::Rotation() const
+{
+    return rotation;
+}
+
+std::string Entity::Name() const
+{
+    return name;
 }

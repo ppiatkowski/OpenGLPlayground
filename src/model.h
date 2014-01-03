@@ -14,6 +14,7 @@
 enum VertexFormat {
     VertexFormat_XYZ = 0,
     VertexFormat_UV,
+    VertexFormat_NXYZ, // normal XYZ
     VertexFormat_XYZW,
     VertexFormat_XYZ_UV,
     VertexFormat_XYZW_UV,
@@ -38,11 +39,13 @@ public:
     //bool Load(const std::string &modelPath);
     //bool Load(unsigned int vertexCnt, float vertices[], float colors[]);
 
-    void AddVBO(const VBOInfo &vbo);
+    void AddVBO(const VBOInfo &vbo); // can be used to manually add vertices to the model
     void Load();
     bool IsLoaded() const;
 
 private:
+    void ConnectToShader(const char *shaderAttrName, unsigned size, unsigned stride, unsigned offset);
+
     std::shared_ptr<ShaderProgram> program;
     std::shared_ptr<Texture> texture;
 

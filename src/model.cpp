@@ -58,6 +58,17 @@ void Model::AddVBO(const VBOInfo &vbo)
     VBOs.push_back(vbo);
 }
 
+void Model::ConnectToShader(const char *shaderAttrName, unsigned size, unsigned stride, unsigned offset)
+{
+    try {
+        GLint attrib = program->attrib(shaderAttrName);
+        glEnableVertexAttribArray(attrib);
+        glVertexAttribPointer(attrib, size, GL_FLOAT, GL_FALSE, stride, (const GLvoid*) offset);
+    } catch (const std::runtime_error& error) {
+        std::cerr << "Model(" << name << "): runtime error " << error.what() << std::endl;
+    }
+}
+
 void Model::Load()
 {
     std::cout << "Loading model " << name << std::endl;
@@ -76,25 +87,19 @@ void Model::Load()
         glGenBuffers(1, (GLuint*)&vbo.id);
         glBindBuffer(GL_ARRAY_BUFFER, vbo.id);
         glBufferData(GL_ARRAY_BUFFER, vbo.vertexData.size() * sizeof(float), &(vbo.vertexData[0]), GL_STATIC_DRAW);
-        GLint attrib;
         switch(vbo.format) {
         case VertexFormat_XYZW_RGBA:
-            attrib = program->attrib("vert");
-            glEnableVertexAttribArray(attrib);
-            glVertexAttribPointer(attrib, 4, GL_FLOAT, GL_FALSE, 8*sizeof(float), 0);
-            attrib = program->attrib("color");
-            glEnableVertexAttribArray(attrib);
-            glVertexAttribPointer(attrib, 4, GL_FLOAT, GL_FALSE, 8*sizeof(float), (const GLvoid*)(5 * sizeof(float)));
+            ConnectToShader("vert", 4, 8*sizeof(float), 0);
+            ConnectToShader("color", 4, 8*sizeof(float), 5 * sizeof(float));
             break;
         case VertexFormat_XYZ:
-            attrib = program->attrib("vert");
-            glEnableVertexAttribArray(attrib);
-            glVertexAttribPointer(attrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0); // czy zero
+            ConnectToShader("vert", 3, 3*sizeof(float), 0);
             break;
         case VertexFormat_UV:
-            attrib = program->attrib("vertexUV");
-            glEnableVertexAttribArray(attrib);
-            glVertexAttribPointer(attrib, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), 0); // czy zero
+            ConnectToShader("vertexUV", 2, 2*sizeof(float), 0);
+            break;
+        case VertexFormat_NXYZ:
+            ConnectToShader("vertexNormal", 3, 3*sizeof(float), 0);
             break;
         default:
             assert(false && "VertexFormat not supported");
